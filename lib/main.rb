@@ -16,6 +16,10 @@ class Board
     def taken?(pos)
         !layout[pos[0]][pos[1]].nil?
     end
+
+    def within_board_range?(pos)
+        pos[0] < 8 && pos[1] < 8 && pos[0] >= 0 && pos[1] >= 0
+    end
 end
 
 class Knight
@@ -32,3 +36,6 @@ end
 
 board = Board.new
 p board.taken?([1,5])
+p board.within_board_range?([8, 8])
+p board.within_board_range?([7, 7])
+p board.within_board_range?([0, 0])
