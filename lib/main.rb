@@ -1,3 +1,12 @@
+class Node
+    attr_accessor :pos, :next_node, :prev_node
+    def initialize(pos, next_node = nil, prev_node = nil)
+        @pos = pos
+        @next_node = next_node
+        @prev_node = prev_node
+    end
+end
+
 class Board
     def initialize
         @layout = Arar.new(8) {Array.new(8) {}}
