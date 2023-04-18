@@ -1,9 +1,21 @@
+require 'pry-byebug'
+
 class Node
-    attr_accessor :pos, :next_node, :prev_node
-    def initialize(pos, next_node = nil, prev_node = nil)
+    attr_accessor :pos, :next_nodes, :prev_node
+    def initialize(pos, next_nodes = [], prev_node = nil)
         @pos = pos
-        @next_node = next_node
+        @next_nodes = next_nodes
         @prev_node = prev_node
+    end
+
+    def print_route
+        node = self
+        str = "#{node.pos}"
+        until node.prev_node.nil?
+            node = node.prev_node
+            str = "#{node.pos} => " + str
+        end
+        str
     end
 end
 
@@ -13,7 +25,13 @@ class Board
         @layout = Array.new(8) {Array.new(8) { nil }}
     end
 
+    def set_position(pos)
+        return if taken?(pos) || !within_board_range?(pos)
+        layout[pos[0]][pos[1]] = "K"
+    end
+
     def taken?(pos)
+        return false if layout[pos[0]].nil?
         !layout[pos[0]][pos[1]].nil?
     end
 
@@ -23,19 +41,37 @@ class Board
 end
 
 class Knight
-    attr_accessor :board, :tree
-    def initialize(board)
+    TRANSFORMATIONS = [[-1, -2], [-2, -1], [-1, 2], [2, -1], [1, -2], [-2, 1], [1, 2], [2, 1]].freeze
+
+    attr_accessor :board, :pos
+    def initialize(pos = [0, 0], board = Board.new)
+        @pos = pos
         @board = board
-        @tree = nil
     end
 
-    def build_tree(pos = [0,0], des)
-        arr << pos
+    def build_routes(pos = @pos, des)
+        pos_node = Node.new(pos)
+        queue = [pos_node]
+        i = -1
+
+        queue.each do |current_pos|
+            TRANSFORMATIONS.each do |t|
+                new_pos = [current_pos.pos[0] + t[0], current_pos.pos[1] + t[1]]
+
+                next if board.taken?(new_pos) || !board.within_board_range?(new_pos)
+
+                board.set_position(current_pos.pos)
+
+                new_node = Node.new(new_pos)
+                new_node.prev_node = current_pos
+                current_pos.next_nodes << new_node
+
+                return new_node if new_pos == des
+                queue << new_node
+            end
+        end
     end
 end
 
-board = Board.new
-p board.taken?([1,5])
-p board.within_board_range?([8, 8])
-p board.within_board_range?([7, 7])
-p board.within_board_range?([0, 0])
+knight = Knight.new([0,1])
+p knight.build_routes([6, 6]).print_route
