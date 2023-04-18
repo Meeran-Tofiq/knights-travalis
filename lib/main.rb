@@ -38,6 +38,10 @@ class Board
     def within_board_range?(pos)
         pos[0] < 8 && pos[1] < 8 && pos[0] >= 0 && pos[1] >= 0
     end
+
+    def reset
+        @layout = Array.new(8) {Array.new(8) { nil }}
+    end
 end
 
 class Knight
@@ -50,9 +54,10 @@ class Knight
     end
 
     def build_routes(pos = @pos, des)
+        return nil unless board.within_board_range?(pos)
+
         pos_node = Node.new(pos)
         queue = [pos_node]
-        i = -1
 
         queue.each do |current_pos|
             TRANSFORMATIONS.each do |t|
@@ -66,7 +71,10 @@ class Knight
                 new_node.prev_node = current_pos
                 current_pos.next_nodes << new_node
 
-                return new_node if new_pos == des
+                if new_pos == des
+                    board.reset
+                    return new_node
+                end
                 queue << new_node
             end
         end
