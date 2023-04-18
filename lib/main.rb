@@ -8,8 +8,13 @@ class Node
 end
 
 class Board
+    attr_accessor :layout
     def initialize
-        @layout = Arar.new(8) {Array.new(8) {}}
+        @layout = Array.new(8) {Array.new(8) { nil }}
+    end
+
+    def taken?(pos)
+        !layout[pos[0]][pos[1]].nil?
     end
 end
 
@@ -22,5 +27,8 @@ class Knight
 
     def build_tree(pos = [0,0], des)
         arr << pos
-
+    end
 end
+
+board = Board.new
+p board.taken?([1,5])
